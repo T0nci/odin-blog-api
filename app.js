@@ -1,7 +1,14 @@
-require("dotenv");
+require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: [process.env.USER_URL, process.env.AUTHOR_URL],
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
