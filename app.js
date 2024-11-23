@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const indexRouter = require("./routes/indexRouter");
 const CustomError = require("./utils/CustomError");
 
 const app = express();
@@ -13,6 +14,8 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/", indexRouter);
 
 // if no route matched then this is a 404
 app.use((req, res, next) => {
