@@ -15,6 +15,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+require("./utils/passport-config");
+
 app.use("/", indexRouter);
 
 // if no route matched then this is a 404
@@ -23,7 +25,10 @@ app.use((req, res, next) => {
 });
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  if (!err.statusCode) {
+  if (err.message === "Unauthorized" && err.status === 401) {
+    err.statusCode = 400;
+    err.message = "Incorrect username and/or password";
+  } else if (!err.statusCode) {
     console.error(err);
     err.statusCode = 500;
     err.message = "Internal Server Error";

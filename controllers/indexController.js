@@ -2,6 +2,8 @@ const { validationResult, body } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 const validateRegister = () => [
   body("username")
@@ -73,6 +75,17 @@ const registerPost = [
   }),
 ];
 
+const loginPost = [
+  passport.authenticate("local", { session: false, failWithError: true }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    return res.json({ token });
+  },
+];
+
 module.exports = {
   registerPost,
+  loginPost,
 };
