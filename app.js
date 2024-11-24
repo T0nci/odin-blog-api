@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const indexRouter = require("./routes/indexRouter");
+const postRouter = require("./routes/postRouter");
 const CustomError = require("./utils/CustomError");
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 require("./utils/passport-config");
 
 app.use("/", indexRouter);
+app.use("/posts", postRouter);
 
 // if no route matched then this is a 404
 app.use((req, res, next) => {
