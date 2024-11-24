@@ -2,6 +2,7 @@ const { validationResult, body } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 const CustomError = require("../utils/CustomError");
 
 const validatePost = () => [
@@ -30,6 +31,36 @@ const isAuthor = [
   }),
 ];
 
+const extractUser = asyncHandler(async (req, res, next) => {
+  const header = req.get("Authorization");
+  if (header) {
+    const token = header.split(" ")[1];
+
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await prisma.user.findUnique({
+      where: {
+        id: payload.id,
+      },
+    });
+  }
+
+  next();
+});
+
+const postsGet = [
+  extractUser,
+  asyncHandler(async (req, res) => {
+    let where = null;
+    if (req.user && req.user.is_author) where = {};
+    else where = { is_published: true };
+
+    const posts = await prisma.post.findMany({ where });
+
+    res.json({ posts });
+  }),
+];
+
 const postsPost = [
   validatePost(),
   asyncHandler(async (req, res) => {
@@ -50,5 +81,7 @@ const postsPost = [
 
 module.exports = {
   isAuthor,
+  extractUser,
+  postsGet,
   postsPost,
 };
