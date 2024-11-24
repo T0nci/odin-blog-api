@@ -85,7 +85,15 @@ const loginPost = [
   },
 ];
 
+const jwtTestGet = [
+  passport.authenticate("jwt", { session: false, failWithError: true }),
+  (req, res) => {
+    res.json({ response: req.user.id });
+  },
+];
+
 module.exports = {
   registerPost,
   loginPost,
+  jwtTestGet,
 };
