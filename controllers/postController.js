@@ -1,8 +1,7 @@
 const { validationResult, body } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
-const { validateToken } = require("../utils/auth-middleware");
-const jwt = require("jsonwebtoken");
+const { validateToken, extractUser } = require("../utils/auth-middleware");
 
 const validatePost = () => [
   body("title")
@@ -15,26 +14,8 @@ const validatePost = () => [
     .withMessage("Content must be at least 1 character."),
 ];
 
-// For routes not protected that need customizations
-const extractUser = asyncHandler(async (req, res, next) => {
-  const header = req.get("Authorization");
-  if (header) {
-    const token = header.split(" ")[1];
-
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = await prisma.user.findUnique({
-      where: {
-        id: payload.id,
-      },
-    });
-  }
-
-  next();
-});
-
 const postsGet = [
-  extractUser,
+  asyncHandler(extractUser),
   asyncHandler(async (req, res) => {
     let where = null;
     if (req.user && req.user.is_author) where = {};

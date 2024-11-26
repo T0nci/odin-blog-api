@@ -21,6 +21,7 @@ const login = async (req, res, next) => {
   next();
 };
 
+// For protected routes
 const validateToken = async (req, res, next) => {
   const header = req.get("Authorization");
   if (!header) return res.json({ error: "401" });
@@ -39,7 +40,26 @@ const validateToken = async (req, res, next) => {
   });
 };
 
+// For routes not protected that need customizations
+const extractUser = async (req, res, next) => {
+  const header = req.get("Authorization");
+  if (header) {
+    const token = header.split(" ")[1];
+
+    const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+
+    req.user = await prisma.user.findUnique({
+      where: {
+        id: decoded.id,
+      },
+    });
+  }
+
+  next();
+};
+
 module.exports = {
   login,
   validateToken,
+  extractUser,
 };
