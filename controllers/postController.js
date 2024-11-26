@@ -16,6 +16,7 @@ const validatePost = () => [
     .withMessage("Content must be at least 1 character."),
 ];
 
+// For author only routes
 const isAuthor = [
   passport.authenticate("jwt", { session: false, failWithError: true }),
   asyncHandler(async (req, res, next) => {
@@ -31,6 +32,7 @@ const isAuthor = [
   }),
 ];
 
+// For routes not protected that need customizations
 const extractUser = asyncHandler(async (req, res, next) => {
   const header = req.get("Authorization");
   if (header) {
@@ -62,6 +64,7 @@ const postsGet = [
 ];
 
 const postsPost = [
+  isAuthor,
   validatePost(),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -80,8 +83,6 @@ const postsPost = [
 ];
 
 module.exports = {
-  isAuthor,
-  extractUser,
   postsGet,
   postsPost,
 };
