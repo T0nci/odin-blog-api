@@ -1,7 +1,7 @@
 const { validationResult, body } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
-const passport = require("passport");
+const { validateToken } = require("../utils/auth-middleware");
 const jwt = require("jsonwebtoken");
 const CustomError = require("../utils/CustomError");
 
@@ -18,7 +18,7 @@ const validatePost = () => [
 
 // For author only routes
 const isAuthor = [
-  passport.authenticate("jwt", { session: false, failWithError: true }),
+  asyncHandler(validateToken),
   asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: {
