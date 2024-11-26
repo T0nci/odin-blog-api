@@ -15,22 +15,6 @@ const validatePost = () => [
     .withMessage("Content must be at least 1 character."),
 ];
 
-// For author only routes
-const isAuthor = [
-  asyncHandler(validateToken),
-  asyncHandler(async (req, res, next) => {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.user.id,
-      },
-    });
-
-    if (!user || !user.is_author) res.json({ error: "401" });
-
-    next();
-  }),
-];
-
 // For routes not protected that need customizations
 const extractUser = asyncHandler(async (req, res, next) => {
   const header = req.get("Authorization");
@@ -63,7 +47,12 @@ const postsGet = [
 ];
 
 const postsPost = [
-  isAuthor,
+  asyncHandler(validateToken),
+  asyncHandler(async (req, res, next) => {
+    if (!req.user.is_author) return res.json({ error: "401" });
+
+    next();
+  }),
   validatePost(),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
