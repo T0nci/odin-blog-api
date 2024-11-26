@@ -3,7 +3,6 @@ const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
 const { validateToken } = require("../utils/auth-middleware");
 const jwt = require("jsonwebtoken");
-const CustomError = require("../utils/CustomError");
 
 const validatePost = () => [
   body("title")
@@ -26,7 +25,7 @@ const isAuthor = [
       },
     });
 
-    if (!user || !user.is_author) throw new CustomError(401, "Unauthorized");
+    if (!user || !user.is_author) res.json({ error: "401" });
 
     next();
   }),

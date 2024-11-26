@@ -16,8 +16,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-require("./utils/passport-config");
-
 app.use("/", indexRouter);
 app.use("/posts", postRouter);
 
@@ -27,11 +25,7 @@ app.use((req, res, next) => {
 });
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  if (err.message === "invalid token") {
-    err.statusCode = 401;
-  } else if (err.message === "Unauthorized" && err.status === 401) {
-    err.statusCode = 401;
-  } else if (!err.statusCode) {
+  if (!err.statusCode) {
     console.error(err);
     err.statusCode = 500;
     err.message = "Internal Server Error";
