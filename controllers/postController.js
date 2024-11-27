@@ -44,6 +44,18 @@ const validateComment = () =>
     .isLength({ min: 1, max: 230 })
     .withMessage("Comment must contain between 1 and 230 characters.");
 
+const validateCommentId = () =>
+  param("commentId").custom(async (commentId, { req }) => {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: Number(commentId),
+        post_id: Number(req.params.postId),
+      },
+    });
+
+    if (!comment) throw false;
+  });
+
 const postsGet = [
   asyncHandler(extractUser),
   asyncHandler(async (req, res) => {
@@ -250,6 +262,25 @@ const commentsPost = [
   }),
 ];
 
+const commentsDelete = [
+  asyncHandler(validateToken),
+  asyncHandler(isAuthor),
+  validatePostId(),
+  validateCommentId(),
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(404).json({ error: "404" });
+
+    await prisma.comment.delete({
+      where: {
+        id: Number(req.params.commentId),
+      },
+    });
+
+    res.json({ status: "200" });
+  }),
+];
+
 module.exports = {
   postsGet,
   postsPost,
@@ -258,4 +289,5 @@ module.exports = {
   postDelete,
   commentsGet,
   commentsPost,
+  commentsDelete,
 };
