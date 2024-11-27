@@ -188,11 +188,20 @@ const postDelete = [
     next();
   },
   asyncHandler(async (req, res) => {
-    await prisma.post.delete({
-      where: {
-        id: Number(req.params.postId),
-      },
-    });
+    const postId = Number(req.params.postId);
+
+    await prisma.$transaction([
+      prisma.comment.deleteMany({
+        where: {
+          post_id: postId,
+        },
+      }),
+      prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      }),
+    ]);
 
     res.json({ status: "200" });
   }),
