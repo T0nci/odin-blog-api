@@ -8,5 +8,7 @@ postRouter.get("/:postId", postController.postIdGet);
 postRouter.post("/", postController.postsPost);
 postRouter.put("/:postId", postController.postPut);
 postRouter.delete("/:postId", postController.postDelete);
+postRouter.get("/:postId/comments", postController.commentsGet);
+postRouter.post("/:postId/comments", postController.commentsPost);
 
 module.exports = postRouter;

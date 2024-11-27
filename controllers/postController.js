@@ -38,6 +38,12 @@ const validatePostId = () =>
     if (!post) throw false;
   });
 
+const validateComment = () =>
+  body("comment")
+    .trim()
+    .isLength({ min: 1, max: 230 })
+    .withMessage("Comment must contain between 1 and 230 characters.");
+
 const postsGet = [
   asyncHandler(extractUser),
   asyncHandler(async (req, res) => {
@@ -180,10 +186,76 @@ const postDelete = [
   }),
 ];
 
+const commentsGet = [
+  validatePostId(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(404).json({ error: "404" });
+
+    next();
+  },
+  asyncHandler(extractUser),
+  asyncHandler(async (req, res) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: Number(req.params.postId),
+      },
+    });
+
+    if (post.is_published || (req.user && req.user.is_author)) {
+      const comments = await prisma.comment.findMany({
+        where: {
+          id: post.id,
+        },
+      });
+
+      return res.json({ comments });
+    }
+
+    res.status(404).json({ error: "404" });
+  }),
+];
+
+const commentsPost = [
+  asyncHandler(validateToken),
+  validatePostId(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(404).json({ error: "404" });
+
+    next();
+  },
+  validateComment(),
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    const post = await prisma.post.findUnique({
+      where: {
+        id: Number(req.params.postId),
+      },
+    });
+    if (!post.is_published) return res.status(404).json({ error: "404" });
+
+    const comment = await prisma.comment.create({
+      data: {
+        content: req.body.comment,
+        post_id: post.id,
+        user_id: req.user.id,
+      },
+    });
+
+    res.status(201).json({ comment });
+  }),
+];
+
 module.exports = {
   postsGet,
   postsPost,
   postIdGet,
   postPut,
   postDelete,
+  commentsGet,
+  commentsPost,
 };
