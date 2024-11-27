@@ -1,7 +1,11 @@
 const { validationResult, body, param } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
-const { validateToken, extractUser } = require("../utils/auth-middleware");
+const {
+  validateToken,
+  extractUser,
+  isAuthor,
+} = require("../utils/auth-middleware");
 
 const validatePost = () => [
   body("title")
@@ -40,11 +44,7 @@ const postsGet = [
 
 const postsPost = [
   asyncHandler(validateToken),
-  asyncHandler(async (req, res, next) => {
-    if (!req.user.is_author) return res.status(401).json({ error: "401" });
-
-    next();
-  }),
+  asyncHandler(isAuthor),
   validatePost(),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);

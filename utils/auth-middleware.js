@@ -58,8 +58,16 @@ const extractUser = async (req, res, next) => {
   next();
 };
 
+// For routes that only the author can access
+const isAuthor = async (req, res, next) => {
+  if (!req.user || !req.user.is_author) return res.json({ error: "401" });
+
+  next();
+};
+
 module.exports = {
   login,
   validateToken,
   extractUser,
+  isAuthor,
 };
