@@ -18,6 +18,15 @@ const validatePost = () => [
     .withMessage("Content must be at least 1 character."),
 ];
 
+const validatePostUpdate = () =>
+  body("action").custom((action, { req }) => {
+    return action === "update" && req.body.title && req.body.content
+      ? true
+      : action === "publish"
+        ? true
+        : false;
+  });
+
 const validatePostId = () =>
   param("postId").custom(async (postId) => {
     const post = await prisma.post.findUnique({
@@ -84,8 +93,75 @@ const postIdGet = [
   }),
 ];
 
+const postPut = [
+  asyncHandler(validateToken),
+  asyncHandler(isAuthor),
+  validatePostId(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(404).json({ error: "404" });
+
+    next();
+  },
+  validatePostUpdate(),
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res
+        .status(400)
+        .json(
+          req.body.action === "update"
+            ? { error: "Missing arguments" }
+            : { error: "Unknown action" },
+        );
+
+    const action = req.body.action;
+    const postId = Number(req.params.postId);
+
+    if (action === "update")
+      await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data: {
+          title: req.body.title,
+          content: req.body.content,
+        },
+      });
+    else if (action === "publish") {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        select: {
+          is_published: true,
+        },
+      });
+
+      const data = {};
+      if (post.is_published) {
+        data.is_published = false;
+        data.date_published = null;
+      } else {
+        data.is_published = true;
+        data.date_published = new Date().toISOString();
+      }
+
+      await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data,
+      });
+    }
+
+    res.json({ status: "200" });
+  }),
+];
+
 module.exports = {
   postsGet,
   postsPost,
   postIdGet,
+  postPut,
 };
