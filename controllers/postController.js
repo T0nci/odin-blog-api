@@ -30,7 +30,7 @@ const postsGet = [
 const postsPost = [
   asyncHandler(validateToken),
   asyncHandler(async (req, res, next) => {
-    if (!req.user.is_author) return res.json({ error: "401" });
+    if (!req.user.is_author) return res.status(401).json({ error: "401" });
 
     next();
   }),

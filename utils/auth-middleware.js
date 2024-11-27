@@ -12,10 +12,10 @@ const login = async (req, res, next) => {
     errors: [{ msg: "Incorrect username and/or password" }],
   };
 
-  if (!user) return res.json(message);
+  if (!user) return res.status(400).json(message);
 
   const match = await bcrypt.compare(req.body.password, user.password);
-  if (!match) return res.json(message);
+  if (!match) return res.status(400).json(message);
 
   req.user = user;
   next();
@@ -24,12 +24,12 @@ const login = async (req, res, next) => {
 // For protected routes
 const validateToken = async (req, res, next) => {
   const header = req.get("Authorization");
-  if (!header) return res.json({ error: "401" });
+  if (!header) return res.status(401).json({ error: "401" });
 
   const token = header.split(" ")[1];
 
   jsonwebtoken.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if (err) return res.json({ error: "401" });
+    if (err) return res.status(401).json({ error: "401" });
 
     req.user = await prisma.user.findUnique({
       where: {
