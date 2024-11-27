@@ -159,9 +159,31 @@ const postPut = [
   }),
 ];
 
+const postDelete = [
+  asyncHandler(validateToken),
+  asyncHandler(isAuthor),
+  validatePostId(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(404).json({ error: "404" });
+
+    next();
+  },
+  asyncHandler(async (req, res) => {
+    await prisma.post.delete({
+      where: {
+        id: Number(req.params.postId),
+      },
+    });
+
+    res.json({ status: "200" });
+  }),
+];
+
 module.exports = {
   postsGet,
   postsPost,
   postIdGet,
   postPut,
+  postDelete,
 };
