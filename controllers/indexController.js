@@ -81,7 +81,7 @@ const loginPost = [
     const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    return res.json({ token });
+    return res.json({ token, displayName: req.user.display_name });
   },
 ];
 
