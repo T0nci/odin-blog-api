@@ -45,7 +45,7 @@ const validateRegister = () => [
   body("displayName")
     .trim()
     .isLength({ min: 1, max: 20 })
-    .withMessage("Username must be between 1 and 20 characters long."),
+    .withMessage("Display name must be between 1 and 20 characters long."),
 ];
 
 const registerPost = [
