@@ -5,7 +5,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const login = async (req, res, next) => {
   const user = await prisma.user.findUnique({
     where: {
-      username: req.body.username,
+      username: req.body.username || "",
     },
   });
   const message = {
