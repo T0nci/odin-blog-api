@@ -45,7 +45,17 @@ const validateRegister = () => [
   body("displayName")
     .trim()
     .isLength({ min: 1, max: 20 })
-    .withMessage("Display name must be between 1 and 20 characters long."),
+    .withMessage("Display name must be between 1 and 20 characters long.")
+    .custom(async (display_name) => {
+      const result = await prisma.user.findUnique({
+        where: {
+          display_name,
+        },
+      });
+
+      if (result) throw false;
+    })
+    .withMessage("Display name already exists."),
 ];
 
 const registerPost = [
