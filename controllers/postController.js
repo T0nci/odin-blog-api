@@ -224,11 +224,13 @@ const commentsGet = [
     });
 
     if (post.is_published || (req.user && req.user.is_author)) {
-      const comments = await prisma.comment.findMany({
-        where: {
-          id: post.id,
-        },
-      });
+      const comments = await prisma.$queryRaw`
+        SELECT c.id, content, date, display_name AS "displayName", is_author
+        FROM "Comment" AS c
+        JOIN "User" AS u
+        ON c.user_id = u.id
+        WHERE post_id = ${Number(req.params.postId)}
+      `;
 
       return res.json({ comments });
     }
