@@ -269,6 +269,15 @@ const commentsPost = [
       },
     });
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    comment.displayName = user.display_name;
+    delete comment.user_id;
+
     res.status(201).json({ comment });
   }),
 ];
