@@ -59,10 +59,18 @@ const extractUser = async (req, res, next) => {
 };
 
 // For routes that only the author can access
-const isAuthor = async (req, res, next) => {
+const isAuthor = (req, res, next) => {
   if (!req.user || !req.user.is_author) return res.json({ error: "401" });
 
   next();
+};
+
+// For returning a jsonwebtoken with information from req.user
+const returnJsonToken = (req, res) => {
+  const token = jsonwebtoken.sign({ id: req.user.id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+  return res.json({ token, displayName: req.user.display_name });
 };
 
 module.exports = {
@@ -70,4 +78,5 @@ module.exports = {
   validateToken,
   extractUser,
   isAuthor,
+  returnJsonToken,
 };

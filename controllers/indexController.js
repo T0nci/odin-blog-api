@@ -2,8 +2,12 @@ const { validationResult, body } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const prisma = require("../prisma/client");
 const bcrypt = require("bcryptjs");
-const { login, validateToken } = require("../utils/auth-middleware");
-const jwt = require("jsonwebtoken");
+const {
+  login,
+  validateToken,
+  returnJsonToken,
+  isAuthor,
+} = require("../utils/auth-middleware");
 
 const validateRegister = () => [
   body("username")
@@ -85,14 +89,12 @@ const registerPost = [
   }),
 ];
 
-const loginPost = [
+const loginPost = [asyncHandler(login), returnJsonToken];
+
+const loginAuthorPost = [
   asyncHandler(login),
-  (req, res) => {
-    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    return res.json({ token, displayName: req.user.display_name });
-  },
+  asyncHandler(isAuthor),
+  returnJsonToken,
 ];
 
 const jwtTestGet = [
@@ -105,5 +107,6 @@ const jwtTestGet = [
 module.exports = {
   registerPost,
   loginPost,
+  loginAuthorPost,
   jwtTestGet,
 };

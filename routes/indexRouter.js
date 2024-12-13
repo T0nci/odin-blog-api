@@ -5,6 +5,7 @@ const indexRouter = Router();
 
 indexRouter.post("/register", indexController.registerPost);
 indexRouter.post("/login", indexController.loginPost);
+indexRouter.post("/login-author", indexController.loginAuthorPost);
 indexRouter.get("/jwt-test", indexController.jwtTestGet);
 
 module.exports = indexRouter;
