@@ -136,8 +136,9 @@ const postPut = [
     const action = req.body.action;
     const postId = Number(req.params.postId);
 
+    let updatedPost = null;
     if (action === "update")
-      await prisma.post.update({
+      updatedPost = await prisma.post.update({
         where: {
           id: postId,
         },
@@ -165,7 +166,7 @@ const postPut = [
         data.date_published = new Date().toISOString();
       }
 
-      await prisma.post.update({
+      updatedPost = await prisma.post.update({
         where: {
           id: postId,
         },
@@ -173,7 +174,7 @@ const postPut = [
       });
     }
 
-    res.json({ status: "200" });
+    res.json({ post: updatedPost });
   }),
 ];
 
