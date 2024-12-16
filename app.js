@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const indexRouter = require("./routes/indexRouter");
 const postRouter = require("./routes/postRouter");
+const commentRouter = require("./routes/commentRouter");
 const CustomError = require("./utils/CustomError");
 
 const app = express();
@@ -17,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", indexRouter);
-app.use("/posts", postRouter);
+app.use("/posts", postRouter, commentRouter);
 
 // if no route matched then this is a 404
 app.use((req, res, next) => {
