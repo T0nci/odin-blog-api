@@ -26,7 +26,10 @@ app.use((req, res, next) => {
 });
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  if (!err.statusCode) {
+  if (err.message === "invalid token") {
+    err.statusCode = 401;
+    err.message = "Unauthorized";
+  } else if (!err.statusCode) {
     console.error(err);
     err.statusCode = 500;
     err.message = "Internal Server Error";
