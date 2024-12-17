@@ -20,7 +20,12 @@ const validatePost = () => [
 
 const validatePostUpdate = () =>
   body("action").custom((action, { req }) => {
-    return action === "update" && req.body.title && req.body.content
+    return action === "update" &&
+      req.body.title &&
+      req.body.title.length >= 1 &&
+      req.body.title.length <= 100 &&
+      req.body.content &&
+      req.body.content.length >= 1
       ? true
       : action === "publish"
         ? true
@@ -107,13 +112,16 @@ const postPut = [
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
-      return res
-        .status(400)
-        .json(
-          req.body.action === "update"
-            ? { error: "Missing arguments" }
-            : { error: "Unknown action" },
-        );
+      return res.status(400).json(
+        req.body.action === "update"
+          ? {
+              errors: [
+                { msg: "Title must be between 1 and 100 characters." },
+                { msg: "Content must be at least 1 character." },
+              ],
+            }
+          : { errors: [{ msg: "Unknown action" }] },
+      );
 
     const action = req.body.action;
     const postId = Number(req.params.postId);
