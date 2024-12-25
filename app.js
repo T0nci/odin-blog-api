@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  if (err.message === "invalid token") {
+  if (err.message === "invalid token" || err.message === "jwt expired") {
     err.statusCode = 401;
     err.message = "Unauthorized";
   } else if (!err.statusCode) {
