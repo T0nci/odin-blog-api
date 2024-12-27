@@ -95,6 +95,7 @@ const commentsPost = [
     });
 
     comment.displayName = user.display_name;
+    comment.is_author = user.is_author;
     delete comment.user_id;
 
     res.status(201).json({ comment });
