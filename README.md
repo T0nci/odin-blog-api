@@ -39,19 +39,19 @@ In this project through challenges and struggle I learnt a lot of things:
 
 ### Setup and running locally
 
-1. Clone the repo
+1. Clone the repo:
    ```bash
    git clone git@github.com:T0nci/odin-blog-api.git
    ```
-   The above example is cloning through SSH, this can be done through HTTPS as well
+   The above example is cloning through SSH, this can be done through HTTPS as well:
    ```bash
    git clone https://github.com/T0nci/odin-blog-api.git
    ```
-2. Install NPM packages
+2. Install NPM packages:
    ```bash
    npm install
    ```
-3. Create `.env` file and set the following environment variables with values that follow the instructions
+3. Create `.env` file and set the following environment variables with values that follow the instructions:
    ```dotenv
    PORT='SELECT A PORT'
    DATABASE_URL='YOUR POSTGRESQL DATABASE URL'
@@ -59,16 +59,16 @@ In this project through challenges and struggle I learnt a lot of things:
    USER_URL='THE URL FROM WHERE USERS WILL MAKE REQUESTS'
    AUTHOR_URL='THE URL FROM WHERE THE AUTHOR WILL MAKE REQUESTS'
    ```
-4. Populate your database with tables from the Prisma schema
+4. Populate your database with tables from the Prisma schema:
    ```bash
    npx prisma migrate deploy
    ```
-5. Start the server
+5. Start the server:
    ```bash
    node app.js
    ```
 
-The server should be up and running. You can interact with the server through Postman or by setting up the [front-end repos](#blog-api).
+The server should be up and running. You can interact with the server through [Postman](https://www.postman.com/) or by setting up the [front-end repos](#blog-api).
 
 ## License
 
